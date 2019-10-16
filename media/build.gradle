@@ -2,8 +2,15 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'//添加bintray插件
 apply plugin: 'com.github.dcendents.android-maven'
 
+//版本
+def libVersion = '1.1.0'
+//项目主页
+def siteUrl = 'https://github.com/hemdenry/MediaSelector'
+//项目的版本控制地址
+def gitUrl = 'https://github.com/hemdenry/MediaSelector.git'
+
 group = 'com.hemdenry.media'
-version = '1.0.0'
+version = libVersion
 
 android {
 
@@ -14,7 +21,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 29
         versionCode 2
-        versionName "1.1.0"
+        versionName libVersion
     }
 
     buildTypes {
@@ -65,21 +72,58 @@ properties.load(project.rootProject.file('local.properties').newDataInputStream(
 bintray {
     user = properties.getProperty("bintray.user")
     key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
 
     pkg {
         repo = 'MediaSelector'
         name = 'com.hemdenry.media'
+        publish = true
+        licenses = ['Apache-2.0']
+        vcsUrl = gitUrl
+        websiteUrl = siteUrl
 
         version {
-            name = '1.1.0'
+            name = libVersion
             desc = "Android media selector."
-            vcsTag = '1.1.0'
+            vcsTag = libVersion
+            released = new Date()
         }
-
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/hemdenry/MediaSelector.git'
-        websiteUrl = 'https://github.com/hemdenry/MediaSelector'
     }
 
-    configurations = ['archives']
+    javadoc {
+        options {
+            encoding "UTF-8"
+            charSet 'UTF-8'
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'Android media selector'
+                url siteUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'hemdenry'
+                        name 'hemdenry'
+                        email 'hemdenry@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
 }
