@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TestMediaPicture</string>
+
+    <string name="label_complete">完成</string>
+    <string name="label_capture">拍摄</string>
+    <string name="label_all_image">所有图片</string>
+    <string name="label_all_video">所有视频</string>
+    <string name="label_all_item">所有项目</string>
+
+    <string name="alert_no_camera">本设备没有相机</string>
+    <string name="alert_take_picture_fail">拍照失败</string>
+
+    <string name="format_max_count">最多只能选择%d项</string>
+</resources>
