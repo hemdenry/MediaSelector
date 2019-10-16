@@ -10,16 +10,17 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.testmediapicture.R;
+import com.hemdenry.media.MediaPick;
 import com.hemdenry.media.bean.Folder;
+import com.hemdenry.media.listener.MediaViewer;
 
 public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder> {
 
     private Context mContext;
     private Cursor mCursor;
     private OnFolderItemClickListener onFolderItemClickListener;
+    private MediaViewer mMediaViewer = MediaPick.getInstance().getMediaConfig().getMediaViewer();
 
     public FolderAdapter(Context context) {
         this.mContext = context;
@@ -45,7 +46,9 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
         final Folder folder = Folder.valueOf(mCursor);
         holder.tvFolderName.setText(folder.getName());
         holder.tvFolderMediaCount.setText(String.valueOf(folder.getCount()));
-        Glide.with(mContext).load(folder.getPath()).apply(new RequestOptions().centerCrop()).into(holder.tvFolderImage);
+        if (mMediaViewer != null) {
+            mMediaViewer.onDisplayFolder(mContext, folder, holder.ivFolderImage);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -65,13 +68,13 @@ public class FolderAdapter extends RecyclerView.Adapter<FolderAdapter.ViewHolder
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView tvFolderImage;
+        private ImageView ivFolderImage;
         private TextView tvFolderName;
         private TextView tvFolderMediaCount;
 
         public ViewHolder(View view) {
             super(view);
-            tvFolderImage = view.findViewById(R.id.folder_image);
+            ivFolderImage = view.findViewById(R.id.folder_image);
             tvFolderName = view.findViewById(R.id.folder_name);
             tvFolderMediaCount = view.findViewById(R.id.folder_media_count);
         }

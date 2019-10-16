@@ -1,17 +1,23 @@
 package com.example.media;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.hemdenry.media.MediaPick;
+import com.hemdenry.media.bean.Folder;
 import com.hemdenry.media.bean.Media;
 import com.hemdenry.media.config.MediaConfig;
+import com.hemdenry.media.listener.MediaViewer;
 import com.hemdenry.media.listener.SelectMediaListener;
 
 import java.io.File;
@@ -24,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageAdapter mImageAdapter;
 
     private MediaConfig mMediaConfig;
+    private MediaViewer mMediaViewer;
     private SelectMediaListener mSelectMediaListener;
     private List<Media> mMediaList;
 
@@ -69,7 +76,21 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        mMediaViewer = new MediaViewer() {
+
+            @Override
+            public void onDisplayFolder(Context context, Folder folder, ImageView imageView) {
+                Glide.with(context).load(folder.getPath()).apply(new RequestOptions().centerCrop()).into(imageView);
+            }
+
+            @Override
+            public void onDisplayMedia(Context context, Media media, ImageView imageView) {
+                Glide.with(context).load(media.getUri()).apply(new RequestOptions().centerCrop()).into(imageView);
+            }
+        };
+
         mMediaConfig = new MediaConfig.Builder()
+                .mediaViewer(mMediaViewer)
                 .handleListener(mSelectMediaListener)
                 .provider("com.example.media.fileprovider")
                 .isShowCamera(true)

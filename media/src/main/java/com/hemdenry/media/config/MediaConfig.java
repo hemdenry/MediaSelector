@@ -1,6 +1,7 @@
 package com.hemdenry.media.config;
 
 import com.hemdenry.media.bean.Media;
+import com.hemdenry.media.listener.MediaViewer;
 import com.hemdenry.media.listener.SelectMediaListener;
 
 import java.io.Serializable;
@@ -28,7 +29,8 @@ public class MediaConfig {
     private float aspectRatioX;//裁剪比，默认1：1
     private float aspectRatioY;//裁剪比，默认1：1
     private String provider;//兼容android7.0设置
-    private String filePath;//拍照以及截图后存放的位置，默认：/Media/Picture
+    private String filePath;//拍照以及截图后存放的位置，默认：/media
+    private MediaViewer mediaViewer;//加载器，显示图片和视频
     private List<Media> selectList;//已选择的照片
 
     private MediaConfig(Builder builder) {
@@ -54,6 +56,7 @@ public class MediaConfig {
         this.isShowOnlyImage = builder.isShowOnlyImage;
         this.isShowOnlyVideo = builder.isShowOnlyVideo;
         this.isShowAll = builder.isShowAll;
+        this.mediaViewer = builder.mediaViewer;
     }
 
     public boolean isCircleCrop() {
@@ -139,6 +142,10 @@ public class MediaConfig {
         return isShowAll;
     }
 
+    public MediaViewer getMediaViewer() {
+        return mediaViewer;
+    }
+
     public static class Builder implements Serializable {
 
         private static MediaConfig mMediaConfig;
@@ -159,8 +166,9 @@ public class MediaConfig {
         private int maxHeight = 500;
         private float aspectRatioX = 1;
         private float aspectRatioY = 1;
-        private String filePath = "/Media/Picture";
+        private String filePath = "/media";
         private String provider;
+        private MediaViewer mediaViewer;
 
         public Builder provider(String provider) {
             this.provider = provider;
@@ -250,6 +258,11 @@ public class MediaConfig {
 
         public Builder memorizeHistory(boolean memorizeHistory) {
             this.isMemorizeHistory = memorizeHistory;
+            return this;
+        }
+
+        public Builder mediaViewer(MediaViewer mediaViewer) {
+            this.mediaViewer = mediaViewer;
             return this;
         }
 

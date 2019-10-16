@@ -11,12 +11,11 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.example.testmediapicture.R;
 import com.hemdenry.media.MediaPick;
 import com.hemdenry.media.bean.Media;
 import com.hemdenry.media.config.MediaConfig;
+import com.hemdenry.media.listener.MediaViewer;
 
 import java.util.List;
 import java.util.Locale;
@@ -30,6 +29,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Media> mSelectList;
     private OnAdapterItemClickListener mOnAdapterItemClickListener;
     private MediaConfig mMediaConfig = MediaPick.getInstance().getMediaConfig();
+    private MediaViewer mMediaViewer = MediaPick.getInstance().getMediaConfig().getMediaViewer();
 
     private final static int HEAD = 0;
     private final static int ITEM = 1;
@@ -117,7 +117,9 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
                 final Media media = Media.valueOf(mCursor);
                 final MediaHolder holder = (MediaHolder) viewHolder;
-                Glide.with(mContext).load(media.getUri()).apply(new RequestOptions().centerCrop()).into(holder.media);
+                if (mMediaViewer != null) {
+                    mMediaViewer.onDisplayMedia(mContext, media, holder.media);
+                }
                 if (mMediaConfig.getMaxSize() > 1) {
                     holder.checkBox.setVisibility(View.VISIBLE);
                     if (mSelectList.contains(media)) {
