@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'//添加bintray插件
 apply plugin: 'com.github.dcendents.android-maven'
 
 //版本
-def libVersion = '1.1.0'
+def libVersion = '1.2.0'
 //项目主页
 def siteUrl = 'https://github.com/hemdenry/MediaSelector'
 //项目的版本控制地址
@@ -19,7 +19,7 @@ android {
     defaultConfig {
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 2
+        versionCode 3
         versionName libVersion
     }
 
