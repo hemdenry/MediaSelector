@@ -10,7 +10,7 @@ import android.widget.PopupWindow;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testmediapicture.R;
+import com.hemdenry.media.R;
 import com.hemdenry.media.adapter.FolderAdapter;
 
 public class FolderWindow extends PopupWindow {

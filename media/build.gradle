@@ -15,7 +15,6 @@ version = libVersion
 android {
 
     compileSdkVersion 29
-    resourcePrefix "MediaSelector"
 
     defaultConfig {
         minSdkVersion 22

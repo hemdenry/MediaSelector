@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MediaConfig {
 
-    private SelectMediaListener mSelectMediaListener;
+    private Builder builder;
 
     private int maxWidth;//最大的裁剪值，默认500
     private int maxHeight;//最大的裁剪值，默认500
@@ -32,13 +32,14 @@ public class MediaConfig {
     private String filePath;//拍照以及截图后存放的位置，默认：/media
     private MediaViewer mediaViewer;//加载器，显示图片和视频
     private List<Media> selectList;//已选择的照片
+    private SelectMediaListener mSelectMediaListener;
 
     private MediaConfig(Builder builder) {
         setBuilder(builder);
     }
 
     private void setBuilder(Builder builder) {
-        this.mSelectMediaListener = builder.mSelectMediaListener;
+        this.builder = builder;
         this.maxSize = builder.maxSize;
         this.isShowCamera = builder.isShowCamera;
         this.filePath = builder.filePath;
@@ -57,6 +58,7 @@ public class MediaConfig {
         this.isShowOnlyVideo = builder.isShowOnlyVideo;
         this.isShowAll = builder.isShowAll;
         this.mediaViewer = builder.mediaViewer;
+        this.mSelectMediaListener = builder.mSelectMediaListener;
     }
 
     public boolean isCircleCrop() {
@@ -69,6 +71,14 @@ public class MediaConfig {
 
     public boolean isShowCamera() {
         return isShowCamera;
+    }
+
+    public void setShowCamera(boolean showCamera) {
+        isShowCamera = showCamera;
+    }
+
+    public void resetShowCamera() {
+        isShowCamera = builder.isShowCamera;
     }
 
     public String getFilePath() {

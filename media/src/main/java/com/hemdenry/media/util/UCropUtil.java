@@ -5,7 +5,7 @@ import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.testmediapicture.R;
+import com.hemdenry.media.R;
 import com.hemdenry.media.config.MediaConfig;
 import com.yalantis.ucrop.UCrop;
 

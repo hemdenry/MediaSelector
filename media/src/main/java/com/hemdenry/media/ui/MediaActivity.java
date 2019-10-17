@@ -10,6 +10,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
@@ -30,8 +31,8 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testmediapicture.R;
 import com.hemdenry.media.MediaPick;
+import com.hemdenry.media.R;
 import com.hemdenry.media.adapter.FolderAdapter;
 import com.hemdenry.media.adapter.MediaAdapter;
 import com.hemdenry.media.bean.Folder;
@@ -72,6 +73,7 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private String[] permissions = new String[]{
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,
     };
 
     @Override
@@ -99,7 +101,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     private boolean havePermission() {
         return ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void init() {
@@ -266,7 +269,21 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+        if (grantResults[0] != PackageManager.PERMISSION_GRANTED || grantResults[1] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.alert_no_storage_permission, Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+
+                @Override
+                public void run() {
+                    finish();
+                }
+            }, 1000);
+        } else if (grantResults[2] != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.alert_no_camera_permission, Toast.LENGTH_SHORT).show();
+            MediaPick.getInstance().getMediaConfig().setShowCamera(false);
+            init();
+        } else {
+            MediaPick.getInstance().getMediaConfig().resetShowCamera();
             init();
         }
     }

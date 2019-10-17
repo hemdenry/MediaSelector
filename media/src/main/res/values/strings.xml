@@ -9,6 +9,8 @@
 
     <string name="alert_no_camera">本设备没有相机</string>
     <string name="alert_take_picture_fail">拍照失败</string>
+    <string name="alert_no_camera_permission">没有相机权限</string>
+    <string name="alert_no_storage_permission">没有读写权限，即将返回</string>
 
     <string name="format_max_count">最多只能选择%d项</string>
 </resources>

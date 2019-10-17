@@ -11,8 +11,8 @@ import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testmediapicture.R;
 import com.hemdenry.media.MediaPick;
+import com.hemdenry.media.R;
 import com.hemdenry.media.bean.Media;
 import com.hemdenry.media.config.MediaConfig;
 import com.hemdenry.media.listener.MediaViewer;

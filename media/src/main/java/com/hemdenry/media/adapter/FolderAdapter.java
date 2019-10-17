@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testmediapicture.R;
 import com.hemdenry.media.MediaPick;
+import com.hemdenry.media.R;
 import com.hemdenry.media.bean.Folder;
 import com.hemdenry.media.listener.MediaViewer;
 

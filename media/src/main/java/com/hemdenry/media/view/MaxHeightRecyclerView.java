@@ -7,7 +7,7 @@ import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.testmediapicture.R;
+import com.hemdenry.media.R;
 
 public class MaxHeightRecyclerView extends RecyclerView {
 
