@@ -46,13 +46,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                //mMediaConfig.setSelectList(mImageList);
+                mMediaConfig.setSelectList(mMediaList);
                 MediaPick.getInstance().setMediaConfig(mMediaConfig).open(MainActivity.this);
             }
         });
 
         initView();
-        initImageConfig(true, 1);
+        initImageConfig(true, 5);
     }
 
     private void initView() {
@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mMediaConfig = new MediaConfig.Builder()
-                .mediaViewer(mMediaViewer)
+        mMediaConfig = new MediaConfig();
+        mMediaConfig.mediaViewer(mMediaViewer)
                 .handleListener(mSelectMediaListener)
                 .provider("com.example.media.fileprovider")
                 .isShowCamera(true)
@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 .showCropFrame(false)
                 .freeStyleEnable(true)
                 .isShowOnlyImage(true)
-                .memorizeHistory(false)
-                .build();
+                .memorizeHistory(false);
     }
 }

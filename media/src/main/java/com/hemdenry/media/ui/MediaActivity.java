@@ -283,7 +283,6 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             MediaPick.getInstance().getMediaConfig().setShowCamera(false);
             init();
         } else {
-            MediaPick.getInstance().getMediaConfig().resetShowCamera();
             init();
         }
     }
