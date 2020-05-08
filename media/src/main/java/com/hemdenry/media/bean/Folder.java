@@ -1,7 +1,7 @@
 package com.hemdenry.media.bean;
 
 import android.database.Cursor;
-import android.provider.MediaStore;
+import android.net.Uri;
 
 import com.hemdenry.media.loader.FolderLoader;
 
@@ -10,14 +10,14 @@ public class Folder {
     public static final String FOLDER_ID_ALL = String.valueOf(-1);
 
     private String id;
-    private String path;
     private String name;
+    private Uri uri;
     private long count;
 
-    public Folder(String id, String path, String name, long count) {
+    public Folder(String id, String name, Uri uri, long count) {
         this.id = id;
-        this.path = path;
         this.name = name;
+        this.uri = uri;
         this.count = count;
     }
 
@@ -29,20 +29,20 @@ public class Folder {
         this.id = id;
     }
 
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(Uri uri) {
+        this.uri = uri;
     }
 
     public long getCount() {
@@ -54,10 +54,11 @@ public class Folder {
     }
 
     public static Folder valueOf(Cursor cursor) {
+        String uri = cursor.getString(cursor.getColumnIndex(FolderLoader.COLUMN_URI));
         return new Folder(
-                cursor.getString(cursor.getColumnIndex("bucket_id")),
-                cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.DATA)),
-                cursor.getString(cursor.getColumnIndex("bucket_display_name")),
+                cursor.getString(cursor.getColumnIndex(FolderLoader.COLUMN_BUCKET_ID)),
+                cursor.getString(cursor.getColumnIndex(FolderLoader.COLUMN_BUCKET_DISPLAY_NAME)),
+                Uri.parse(uri),
                 cursor.getLong(cursor.getColumnIndex(FolderLoader.COLUMN_COUNT))
         );
     }

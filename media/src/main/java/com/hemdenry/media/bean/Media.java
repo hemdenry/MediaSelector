@@ -42,7 +42,7 @@ public class Media {
         } else if (isVideo()) {
             uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
         } else {
-            // ?
+            // unknown
             uri = MediaStore.Files.getContentUri("external");
         }
         this.uri = ContentUris.withAppendedId(uri, id);

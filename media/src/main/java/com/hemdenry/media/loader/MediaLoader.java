@@ -35,11 +35,11 @@ public class MediaLoader extends CursorLoader {
             String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
     };
 
-    private static final String SELECTION_MEDIA_TYPE_WITH_FOLDER_SINGLE = MediaStore.Files.FileColumns.MEDIA_TYPE + "=?" +
-            " AND " + " bucket_id=?" + " AND " + MediaStore.MediaColumns.SIZE + ">0";
+    private static final String SELECTION_MEDIA_TYPE_WITH_FOLDER_SINGLE = MediaStore.Files.FileColumns.MEDIA_TYPE + "=? AND " +
+            FolderLoader.COLUMN_BUCKET_ID + "=? AND " + MediaStore.MediaColumns.SIZE + ">0";
 
-    private static final String SELECTION_MEDIA_TYPE_WITH_FOLDER_ALL = "(" + MediaStore.Files.FileColumns.MEDIA_TYPE + "=?" + " OR " +
-            MediaStore.Files.FileColumns.MEDIA_TYPE + "=?)" + " AND " + " bucket_id=?" + " AND " + MediaStore.MediaColumns.SIZE + ">0";
+    private static final String SELECTION_MEDIA_TYPE_WITH_FOLDER_ALL = "(" + MediaStore.Files.FileColumns.MEDIA_TYPE + "=? OR " +
+            MediaStore.Files.FileColumns.MEDIA_TYPE + "=?) AND " + FolderLoader.COLUMN_BUCKET_ID + "=? AND " + MediaStore.MediaColumns.SIZE + ">0";
 
     private static final String ORDER_BY = "datetaken DESC";
 

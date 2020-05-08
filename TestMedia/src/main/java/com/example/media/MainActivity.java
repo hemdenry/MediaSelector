@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onDisplayFolder(Context context, Folder folder, ImageView imageView) {
-                Glide.with(context).load(folder.getPath()).apply(new RequestOptions().centerCrop()).into(imageView);
+                Glide.with(context).load(folder.getUri()).apply(new RequestOptions().centerCrop()).into(imageView);
             }
 
             @Override
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
                 .crop(isCrop, 0.0f, 0.0f, 1080, 2160)
                 .showCropFrame(false)
                 .freeStyleEnable(true)
-                .isShowOnlyImage(true)
+                .isShowOnlyVideo(true)
                 .memorizeHistory(false);
     }
 }
