@@ -1,86 +1,77 @@
 package com.hemdenry.media.util;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
+
+import com.hemdenry.media.bean.Media;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class FileUtil {
 
-    private final static String PATTERN = "yyyyMMddHHmmss";
-
     /**
-     * 创建文件
-     *
-     * @param context  context
-     * @param filePath 文件路径
-     * @return file
+     * 存入媒体文件：MediaStore.Images、MediaStore.Video、MediaStore.Audio
      */
-    public static File createFile(Context context, String filePath, boolean isImage) {
-        String timeStamp = new SimpleDateFormat(PATTERN, Locale.CHINA).format(new Date());
-        String externalStorageState = Environment.getExternalStorageState();
+    public static Media createFile(Context context, String directory, boolean isImage) {
+        String fileName;
         if (isImage) {
-            timeStamp = "IMG_" + timeStamp;
-            filePath = filePath + File.separator + "image";
+            fileName = "img_" + getRandomFileName() + ".jpg";
+            directory = directory + File.separator + "image";
         } else {
-            timeStamp = "VIDEO_" + timeStamp;
-            filePath = filePath + File.separator + "video";
+            fileName = "video_" + getRandomFileName() + ".mp4";
+            directory = directory + File.separator + "video";
         }
-        File dir = new File(Environment.getExternalStorageDirectory() + filePath);
-        String extension = isImage ? ".jpg" : ".mp4";
-        if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-            return new File(dir, timeStamp + extension);
+        String mimeType = isImage ? "image/jpeg" : "video/mp4";
+        String filePath = Environment.getExternalStorageDirectory() + directory + File.separator + fileName;
+        ContentValues values = new ContentValues(4);
+        values.put(MediaStore.MediaColumns.TITLE, fileName);
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, isImage ? Environment.DIRECTORY_PICTURES : Environment.DIRECTORY_MOVIES);
         } else {
-            File cacheDir = context.getCacheDir();
-            return new File(cacheDir, timeStamp + extension);
+            values.put(MediaStore.MediaColumns.DATA, filePath);
         }
+        Uri uri;
+        if (isImage) {
+            uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        } else {
+            uri = context.getContentResolver().insert(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, values);
+        }
+        Media media = new Media(0, fileName, mimeType, 0, 0);
+        media.setUri(uri);
+        return media;
     }
 
-    /**
-     * 创建初始文件夹，保存拍摄图片和裁剪后的图片
-     *
-     * @param filePath 文件夹路径
-     */
-    public static void createFile(String filePath) {
-        String externalStorageState = Environment.getExternalStorageState();
-        File cropFile = new File(Environment.getExternalStorageDirectory() + filePath + "/crop");
-        if (externalStorageState.equals(Environment.MEDIA_MOUNTED)) {
-            if (!cropFile.exists()) {
-                cropFile.mkdirs();
-            }
-            File file = new File(cropFile, ".nomedia");//创建忽视文件。有该文件，系统将检索不到此文件夹下的图片。
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static String getFilePath(Context context) {
-        String status = Environment.getExternalStorageState();
-        if (status.equals(Environment.MEDIA_MOUNTED)) {
-            return Environment.getExternalStorageDirectory().getPath();
+    public static Media getCropFile(Context context, String directory) {
+        String fileName = "img_" + getRandomFileName() + ".jpg";
+        String filePath = Environment.getExternalStorageDirectory() + directory + File.separator + "image" + File.separator + fileName;
+        ContentValues values = new ContentValues(4);
+        values.put(MediaStore.MediaColumns.TITLE, fileName);
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
         } else {
-            return context.getCacheDir().getAbsolutePath();
+            values.put(MediaStore.MediaColumns.DATA, filePath);
         }
+        Uri uri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        Media media = new Media(0, fileName, "image/jpeg", 0, 0);
+        media.setUri(uri);
+        return media;
     }
 
-    /**
-     * @param filePath 文件夹路径
-     * @return 截图完成的 file
-     */
-    public static File getCropFile(String filePath) {
-        String timeStamp = new SimpleDateFormat(PATTERN, Locale.CHINA).format(new Date());
-        return new File(Environment.getExternalStorageDirectory() + filePath + "/crop/" + timeStamp + ".jpg");
+    public static String getRandomFileName() {
+        Random r = new Random();
+        int randomNumber = r.nextInt(89999) + 10000;//获取随机的五位数
+        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.CHINA).format(System.currentTimeMillis());
+        return timeStamp + "_" + randomNumber;
     }
 }

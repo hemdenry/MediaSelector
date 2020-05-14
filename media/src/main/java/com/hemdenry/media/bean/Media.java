@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 
-import java.io.File;
+import com.hemdenry.media.util.MediaUtil;
 
 /**
  * Created by fanghui on 2019/10/8 10:23
@@ -14,38 +14,31 @@ import java.io.File;
 public class Media {
 
     private long id;
-    private String path;
     private String name;
     private String mimeType;
     private long size;
-    private long modifyDate;
     private long duration;
     private Uri uri;
 
-    public Media(long id, String path, String name, String mimeType, long size, long modifyDate, long duration) {
+    public Media(long id, String name, String mimeType, long size, long duration) {
         this.id = id;
-        this.path = path;
         this.name = name;
         this.mimeType = mimeType;
-        this.modifyDate = modifyDate;
         this.duration = duration;
-
-        if (size < 0) {
-            //某些设备获取size<0，直接计算
-            size = new File(path).length() / 1024;
-        }
         this.size = size;
 
-        Uri uri;
-        if (isImage()) {
-            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        } else if (isVideo()) {
-            uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-        } else {
-            // unknown
-            uri = MediaStore.Files.getContentUri("external");
+        if (id >= 0) {
+            Uri uri;
+            if (isImage()) {
+                uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            } else if (isVideo()) {
+                uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            } else {
+                // unknown
+                uri = MediaStore.Files.getContentUri("external");
+            }
+            this.uri = ContentUris.withAppendedId(uri, id);
         }
-        this.uri = ContentUris.withAppendedId(uri, id);
     }
 
     public long getId() {
@@ -54,14 +47,6 @@ public class Media {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 
     public String getName() {
@@ -86,14 +71,6 @@ public class Media {
 
     public void setSize(long size) {
         this.size = size;
-    }
-
-    public long getModifyDate() {
-        return modifyDate;
-    }
-
-    public void setModifyDate(long modifyDate) {
-        this.modifyDate = modifyDate;
     }
 
     public long getDuration() {
@@ -121,47 +98,37 @@ public class Media {
             return false;
         }
         Media bean = (Media) o;
-        return path.equals(bean.path);
+        return id == bean.id;
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return (int) id * 37 + name.hashCode();
     }
 
     public static Media valueOf(Cursor cursor) {
         return new Media(cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns._ID)),
-                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA)),
                 cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME)),
                 cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE)),
                 cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.SIZE)),
-                cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATE_MODIFIED)),
                 cursor.getLong(cursor.getColumnIndexOrThrow("duration")));
     }
 
     public boolean isImage() {
-        if (mimeType == null) {
-            return false;
-        }
-        return mimeType.startsWith("image");
+        return MediaUtil.isImage(mimeType);
     }
 
     public boolean isVideo() {
-        if (mimeType == null) {
-            return false;
-        }
-        return mimeType.startsWith("video");
+        return MediaUtil.isVideo(mimeType);
     }
 
     @Override
     public String toString() {
         return "Media{" +
                 "id=" + id +
-                ", path='" + path + '\'' +
                 ", name='" + name + '\'' +
                 ", mimeType='" + mimeType + '\'' +
                 ", size=" + size +
-                ", modifyDate=" + modifyDate +
                 ", duration=" + duration +
                 ", uri=" + uri +
                 '}';

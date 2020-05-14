@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.hemdenry.media.config.MediaConfig;
 import com.hemdenry.media.ui.MediaActivity;
-import com.hemdenry.media.util.FileUtil;
 
 public class MediaPick {
 
@@ -37,22 +36,6 @@ public class MediaPick {
         if (TextUtils.isEmpty(mInstance.mMediaConfig.getProvider())) {
             return;
         }
-        FileUtil.createFile(mInstance.mMediaConfig.getFilePath());
-        Intent intent = new Intent(activity, MediaActivity.class);
-        activity.startActivity(intent);
-    }
-
-    public void openCamera(Activity activity) {
-        if (mInstance.mMediaConfig == null) {
-            return;
-        }
-        if (mInstance.mMediaConfig.getHandleListener() == null) {
-            return;
-        }
-        if (TextUtils.isEmpty(mInstance.mMediaConfig.getProvider())) {
-            return;
-        }
-        FileUtil.createFile(mInstance.mMediaConfig.getFilePath());
         Intent intent = new Intent(activity, MediaActivity.class);
         activity.startActivity(intent);
     }

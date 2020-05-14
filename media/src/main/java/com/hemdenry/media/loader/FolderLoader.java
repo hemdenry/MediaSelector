@@ -12,6 +12,7 @@ import androidx.loader.content.CursorLoader;
 
 import com.hemdenry.media.MediaPick;
 import com.hemdenry.media.bean.Folder;
+import com.hemdenry.media.util.MediaUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -160,28 +161,14 @@ public class FolderLoader extends CursorLoader {
         long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Files.FileColumns._ID));
         String mimeType = cursor.getString(cursor.getColumnIndex(MediaStore.MediaColumns.MIME_TYPE));
         Uri contentUri;
-        if (isImage(mimeType)) {
+        if (MediaUtil.isImage(mimeType)) {
             contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        } else if (isVideo(mimeType)) {
+        } else if (MediaUtil.isVideo(mimeType)) {
             contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
         } else {
             // unknown
             contentUri = MediaStore.Files.getContentUri("external");
         }
         return ContentUris.withAppendedId(contentUri, id);
-    }
-
-    private boolean isImage(String mimeType) {
-        if (mimeType == null) {
-            return false;
-        }
-        return mimeType.startsWith("image");
-    }
-
-    private boolean isVideo(String mimeType) {
-        if (mimeType == null) {
-            return false;
-        }
-        return mimeType.startsWith("video");
     }
 }

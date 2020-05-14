@@ -45,7 +45,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, final int position) {
         int realPosition = holder.getLayoutPosition();
         Media media = mMediaList.get(realPosition);
-        Glide.with(mContext).load(media.getUri()).apply(new RequestOptions().centerCrop()).into(holder.image);
+        RequestOptions options = new RequestOptions()
+                .frame(0)
+                .centerCrop()
+                .skipMemoryCache(true);
+        Glide.with(mContext).load(media.getUri()).apply(options).into(holder.image);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

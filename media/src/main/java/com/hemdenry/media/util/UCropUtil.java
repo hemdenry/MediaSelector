@@ -9,12 +9,10 @@ import com.hemdenry.media.R;
 import com.hemdenry.media.config.MediaConfig;
 import com.yalantis.ucrop.UCrop;
 
-import java.io.File;
-
 public class UCropUtil {
 
-    public static void start(AppCompatActivity activity, File sourceFile, File destinationFile, MediaConfig config) {
-        UCrop uCrop = UCrop.of(Uri.fromFile(sourceFile), Uri.fromFile(destinationFile))
+    public static void start(AppCompatActivity activity, Uri sourceFileUri, Uri targetFileUri, MediaConfig config) {
+        UCrop uCrop = UCrop.of(sourceFileUri, targetFileUri)
                 .withAspectRatio(config.getAspectRatioX(), config.getAspectRatioY())
                 .withMaxResultSize(config.getMaxWidth(), config.getMaxHeight());
         UCrop.Options options = new UCrop.Options();

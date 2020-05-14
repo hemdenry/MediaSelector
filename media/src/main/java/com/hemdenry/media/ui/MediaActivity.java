@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,7 +23,6 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.FileProvider;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -44,8 +41,6 @@ import com.hemdenry.media.util.FileUtil;
 import com.hemdenry.media.util.UCropUtil;
 import com.yalantis.ucrop.UCrop;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 
 public class MediaActivity extends AppCompatActivity implements View.OnClickListener, FolderAdapter.OnFolderItemClickListener, MediaAdapter.OnAdapterItemClickListener {
@@ -58,9 +53,8 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     private RecyclerView mRecyclerView;
 
     private String mDefaultFolderName = "";
-    private File mTempCameraFile;
-    private File mTempCropFile;
-    private Uri mCameraFileUri;
+    private Media mCameraMedia;
+    private Media mCropMedia;
     private List<Media> mSelectList;
 
     private MediaConfig mMediaConfig;
@@ -233,18 +227,20 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
             return;
         }
         if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            mTempCameraFile = FileUtil.createFile(this, mMediaConfig.getFilePath(), isImage);
+            mCameraMedia = FileUtil.createFile(this, mMediaConfig.getDirectory(), isImage);
+            Uri uri = mCameraMedia.getUri();
+            if (uri == null) {
+                Toast.makeText(this, R.string.alert_save_media_fail, Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                mCameraFileUri = FileProvider.getUriForFile(this, mMediaConfig.getProvider(), mTempCameraFile);
-            } else {
-                mCameraFileUri = Uri.fromFile(mTempCameraFile);
             }
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCameraFileUri);
+            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
             List<ResolveInfo> infoList = getPackageManager().queryIntentActivities(cameraIntent, PackageManager.MATCH_DEFAULT_ONLY);
             for (ResolveInfo resolveInfo : infoList) {
                 String packageName = resolveInfo.activityInfo.packageName;
-                grantUriPermission(packageName, mCameraFileUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
             startActivityForResult(cameraIntent, REQUEST_CAMERA);
         } else {
@@ -256,9 +252,13 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     public void onClickMedia(Media media) {
         if (mMediaConfig.getMaxSize() == 1) {
             if (mMediaConfig.isCrop() && media.isImage()) {
-                mTempCameraFile = new File(mSelectList.get(0).getPath());
-                mTempCropFile = FileUtil.getCropFile(mMediaConfig.getFilePath());
-                UCropUtil.start(MediaActivity.this, mTempCameraFile, mTempCropFile, mMediaConfig);
+                Uri uri = mSelectList.get(0).getUri();
+                mCropMedia = FileUtil.getCropFile(mContext, mMediaConfig.getDirectory());
+                if (mCropMedia.getUri() == null) {
+                    Toast.makeText(this, R.string.alert_save_media_fail, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                UCropUtil.start(this, uri, mCropMedia.getUri(), mMediaConfig);
                 return;
             }
             mMediaConfig.getHandleListener().onSelectMedia(mSelectList);
@@ -295,93 +295,45 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
                 if (resultCode == RESULT_OK) {
                     if (mMediaConfig.isCrop() && mMediaConfig.isShowOnlyImage() && mMediaConfig.getMaxSize() == 1) {
                         mSelectList.clear();
-                        mTempCropFile = FileUtil.getCropFile(mMediaConfig.getFilePath());
-                        UCropUtil.start(this, mTempCameraFile, mTempCropFile, mMediaConfig);
-                    } else {
-                        String mimeType = getMimeType(mTempCameraFile.getAbsolutePath());
-                        long duration;
-                        if (mMediaConfig.isShowOnlyVideo()) {
-                            duration = getVideoDuration(mTempCameraFile.getAbsolutePath());
-                        } else {
-                            duration = 0;
+                        mCropMedia = FileUtil.getCropFile(this, mMediaConfig.getDirectory());
+                        if (mCropMedia.getUri() == null) {
+                            Toast.makeText(this, R.string.alert_save_media_fail, Toast.LENGTH_SHORT).show();
+                            return;
                         }
-                        Media media = new Media(0, mTempCameraFile.getAbsolutePath(), mTempCameraFile.getName(), mimeType, mTempCameraFile.length(), System.currentTimeMillis(), duration);
-                        media.setUri(mCameraFileUri);
-                        mSelectList.add(media);
-                        handleResult(mTempCameraFile);
+                        UCropUtil.start(this, mCameraMedia.getUri(), mCropMedia.getUri(), mMediaConfig);
+                    } else {
+                        handleResult(mCameraMedia);
                     }
                 } else {
-                    if (mTempCameraFile != null && mTempCameraFile.exists()) {
-                        mTempCameraFile.delete();
+                    deleteMedia(mCameraMedia.getUri());
+                    if (mMediaConfig.isShowOnlyImage()) {
+                        Toast.makeText(this, R.string.alert_take_picture_fail, Toast.LENGTH_SHORT).show();
+                    } else if (mMediaConfig.isShowOnlyVideo()) {
+                        Toast.makeText(this, R.string.alert_take_video_fail, Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(this, R.string.alert_take_picture_fail, Toast.LENGTH_SHORT).show();
                 }
                 break;
             case UCrop.REQUEST_CROP:
                 if (data == null) {
+                    deleteMedia(mCropMedia.getUri());
                     return;
                 }
-                Uri uri = UCrop.getOutput(data);
-                if (mTempCameraFile != null && mTempCameraFile.exists()) {
-                    mTempCameraFile.delete();
-                }
                 mSelectList.clear();
-                String mimeType = getMimeType(mTempCropFile.getAbsolutePath());
-                Media media = new Media(0, mTempCropFile.getAbsolutePath(), mTempCropFile.getName(), mimeType, mTempCropFile.length(), System.currentTimeMillis(), 0);
-                media.setUri(uri);
-                mSelectList.add(media);
-                handleResult(mTempCropFile);
+                handleResult(mCropMedia);
                 break;
         }
     }
 
-    private void handleResult(File file) {
-        notifyMediaUpdate(file);
+    private void handleResult(Media media) {
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, media.getUri()));//通知图库更新
+        mSelectList.add(media);
         if (mMediaConfig.getMaxSize() == 1) {
             mMediaConfig.getHandleListener().onSelectMedia(mSelectList);
             finish();
         }
     }
 
-    private void notifyMediaUpdate(File file) {
-        try {
-            MediaStore.Images.Media.insertImage(getContentResolver(), file.getAbsolutePath(), file.getName(), null);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        // 最后通知图库更新
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
-    }
-
-//    private String getMimeType(String filePath) {
-//        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-//        String mime = "text/plain";
-//        if (filePath != null) {
-//            try {
-//                mmr.setDataSource(filePath);
-//                mime = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE);
-//            } catch (RuntimeException e) {
-//                return mime;
-//            }
-//        }
-//        return mime;
-//    }
-
-    private String getMimeType(String filePath) {
-        String extension = MimeTypeMap.getFileExtensionFromUrl(filePath);
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-    }
-
-    public long getVideoDuration(String videoPath) {
-        int duration;
-        try {
-            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-            mmr.setDataSource(videoPath);
-            duration = Integer.parseInt(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-        return duration;
+    private void deleteMedia(Uri uri) {
+        getContentResolver().delete(uri, null, null);
     }
 }

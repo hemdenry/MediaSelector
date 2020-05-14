@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initView();
-        initImageConfig(true, 5);
+        initImageConfig(true, 3);
     }
 
     private void initView() {
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                 mMediaList = mediaList;
                 mImageAdapter.refreshData(mediaList);
                 for (Media media : mediaList) {
-                    Log.e("Fanghui", "path = " + media.getPath());
+                    Log.e("Fanghui", "uri = " + media.getUri());
                 }
             }
         };
@@ -80,12 +80,20 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onDisplayFolder(Context context, Folder folder, ImageView imageView) {
-                Glide.with(context).load(folder.getUri()).apply(new RequestOptions().centerCrop()).into(imageView);
+                RequestOptions options = new RequestOptions()
+                        .frame(0)
+                        .centerCrop()
+                        .skipMemoryCache(true);
+                Glide.with(context).load(folder.getUri()).apply(options).into(imageView);
             }
 
             @Override
             public void onDisplayMedia(Context context, Media media, ImageView imageView) {
-                Glide.with(context).load(media.getUri()).apply(new RequestOptions().centerCrop()).into(imageView);
+                RequestOptions options = new RequestOptions()
+                        .frame(0)
+                        .centerCrop()
+                        .skipMemoryCache(true);
+                Glide.with(context).load(media.getUri()).apply(options).into(imageView);
             }
         };
 
@@ -95,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 .provider("com.example.media.fileprovider")
                 .isShowCamera(true)
                 .maxSize(size)
-                .filePath(MEDIA_DIR)
+                .directory(MEDIA_DIR)
                 .crop(isCrop, 0.0f, 0.0f, 1080, 2160)
                 .showCropFrame(false)
                 .freeStyleEnable(true)

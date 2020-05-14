@@ -16,11 +16,9 @@ public class MediaLoader extends CursorLoader {
 
     private static final String[] PROJECTION = {
             MediaStore.Files.FileColumns._ID,
-            MediaStore.MediaColumns.DATA,//路径
             MediaStore.MediaColumns.DISPLAY_NAME,
             MediaStore.MediaColumns.MIME_TYPE,
             MediaStore.MediaColumns.SIZE,
-            MediaStore.MediaColumns.DATE_MODIFIED,
             "duration",//时长 long 单位ms(仅视频有)
     };
 

@@ -25,7 +25,7 @@ public class MediaConfig {
     private float aspectRatioX = 1;//裁剪比，默认1：1
     private float aspectRatioY = 1;//裁剪比，默认1：1
     private String provider;//兼容android 7.0设置
-    private String filePath = "/media";//拍照以及截图后存放的位置，默认：/media
+    private String directory = "/media";//拍照以及截图后存放的位置，默认：/media
     private MediaViewer mediaViewer;//加载器，显示图片和视频
     private List<Media> selectList;//已选择的照片
     private SelectMediaListener mSelectMediaListener;
@@ -69,8 +69,8 @@ public class MediaConfig {
         return this;
     }
 
-    public MediaConfig filePath(String filePath) {
-        this.filePath = filePath;
+    public MediaConfig directory(String directory) {
+        this.directory = directory;
         return this;
     }
 
@@ -142,8 +142,8 @@ public class MediaConfig {
         isShowCamera = showCamera;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public String getDirectory() {
+        return directory;
     }
 
     public SelectMediaListener getHandleListener() {
