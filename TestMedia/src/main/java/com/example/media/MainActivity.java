@@ -20,7 +20,6 @@ import com.hemdenry.media.config.MediaConfig;
 import com.hemdenry.media.listener.MediaViewer;
 import com.hemdenry.media.listener.SelectMediaListener;
 
-import java.io.File;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private SelectMediaListener mSelectMediaListener;
     private List<Media> mMediaList;
 
-    public static String MEDIA_DIR = File.separator + "media";
+    public static String MEDIA_DIR = "media";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

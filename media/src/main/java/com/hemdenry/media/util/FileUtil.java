@@ -29,7 +29,7 @@ public class FileUtil {
             directory = directory + File.separator + "video";
         }
         String mimeType = isImage ? "image/jpeg" : "video/mp4";
-        String filePath = Environment.getExternalStorageDirectory() + directory + File.separator + fileName;
+        String filePath = Environment.getExternalStorageDirectory() + File.separator + directory + File.separator + fileName;
         ContentValues values = new ContentValues(4);
         values.put(MediaStore.MediaColumns.TITLE, fileName);
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
@@ -52,7 +52,7 @@ public class FileUtil {
 
     public static Media getCropFile(Context context, String directory) {
         String fileName = "img_" + getRandomFileName() + ".jpg";
-        String filePath = Environment.getExternalStorageDirectory() + directory + File.separator + "image" + File.separator + fileName;
+        String filePath = Environment.getExternalStorageDirectory() + File.separator + directory + File.separator + "image" + File.separator + fileName;
         ContentValues values = new ContentValues(4);
         values.put(MediaStore.MediaColumns.TITLE, fileName);
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
