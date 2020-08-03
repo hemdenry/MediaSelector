@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                 .crop(isCrop, 0.0f, 0.0f, 1080, 2160)
                 .showCropFrame(false)
                 .freeStyleEnable(true)
-                .isShowOnlyVideo(true)
+                .isShowOnlyImage(true)
                 .memorizeHistory(false);
     }
 }

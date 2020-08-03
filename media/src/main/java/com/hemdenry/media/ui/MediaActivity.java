@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -214,19 +213,18 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onOpenCamera() {
-        Intent cameraIntent = null;
+        Intent intent = null;
         boolean isImage = true;
         if (mMediaConfig.isShowOnlyImage()) {
-            isImage = true;
-            cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         } else if (mMediaConfig.isShowOnlyVideo()) {
             isImage = false;
-            cameraIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+            intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         }
-        if (cameraIntent == null) {
+        if (intent == null) {
             return;
         }
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+        if (intent.resolveActivity(getPackageManager()) != null) {
             mCameraMedia = FileUtil.createFile(this, mMediaConfig.getDirectory(), isImage);
             Uri uri = mCameraMedia.getUri();
             if (uri == null) {
@@ -234,15 +232,11 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
                 return;
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                cameraIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             }
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-            List<ResolveInfo> infoList = getPackageManager().queryIntentActivities(cameraIntent, PackageManager.MATCH_DEFAULT_ONLY);
-            for (ResolveInfo resolveInfo : infoList) {
-                String packageName = resolveInfo.activityInfo.packageName;
-                grantUriPermission(packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
-            startActivityForResult(cameraIntent, REQUEST_CAMERA);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            startActivityForResult(intent, REQUEST_CAMERA);
         } else {
             Toast.makeText(this, R.string.alert_no_camera, Toast.LENGTH_SHORT).show();
         }
@@ -325,7 +319,6 @@ public class MediaActivity extends AppCompatActivity implements View.OnClickList
     }
 
     private void handleResult(Media media) {
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, media.getUri()));//通知图库更新
         mSelectList.add(media);
         if (mMediaConfig.getMaxSize() == 1) {
             mMediaConfig.getHandleListener().onSelectMedia(mSelectList);
