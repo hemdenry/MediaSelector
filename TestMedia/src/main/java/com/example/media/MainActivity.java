@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         initView();
-        initImageConfig(true, 3);
+        initImageConfig(true, 1);
     }
 
     private void initView() {
