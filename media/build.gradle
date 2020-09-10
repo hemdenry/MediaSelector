@@ -3,7 +3,7 @@ apply plugin: 'com.jfrog.bintray'//添加bintray插件
 apply plugin: 'com.github.dcendents.android-maven'
 
 //版本
-def libVersion = '1.5.2'
+def libVersion = '1.5.3'
 //项目主页
 def siteUrl = 'https://github.com/hemdenry/MediaSelector'
 //项目的版本控制地址
@@ -19,7 +19,7 @@ android {
     defaultConfig {
         minSdkVersion 22
         targetSdkVersion 29
-        versionCode 7
+        versionCode 8
         versionName libVersion
     }
 
@@ -32,10 +32,9 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'com.github.yalantis:ucrop:2.2.5'
+    api 'androidx.appcompat:appcompat:1.2.0'
+    api 'androidx.recyclerview:recyclerview:1.1.0'
+    api 'com.github.yalantis:ucrop:2.2.5'
 }
 
 // 指定编码
